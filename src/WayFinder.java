@@ -50,6 +50,9 @@ public class WayFinder {
             current = current.getPreviousNode();
         }
         Collections.reverse(foundWay);
+        if(!foundWay.get(0).equals(graph.get(start))){
+            foundWay = null;
+        }
     }
 
     public ArrayList<Node> getFoundWay(){

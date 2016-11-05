@@ -100,7 +100,7 @@ public class Node {
 
     @Override
     public String toString(){
-        return this.id;
+        return "id:" + this.id + " lat: " + this.latitude + " lon: "+ this.longitude + " distance from start: " + this.distance;
     }
 
 }

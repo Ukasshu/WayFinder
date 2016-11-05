@@ -27,6 +27,9 @@ public class GraphReader {
     }
 
     public void openFile(String filepath) throws FileNotFoundException{
+        if(input!=null){
+            input.close();
+        }
         file = new File(filepath);
         graphRead = false;
         input = new Scanner(file);
@@ -99,7 +102,7 @@ public class GraphReader {
                 currentLine = input.nextLine();
                 longitude = Double.parseDouble(currentLine.replaceAll("[^\\d.]",""));
                 if(graph.containsKey(id)) {
-                    graph.get(id).setCoordinates(latitude, longitude);
+                    graph.get(id).setCoordinates(longitude, latitude);
                 }
             }
             currentLine = input.nextLine();
