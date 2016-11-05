@@ -5,16 +5,12 @@ import java.util.stream.Stream;
 /**
  * Created by lukasz on 04.11.16.
  */
-public class NodeComparator implements Comparator<String>{
+public class NodeComparator implements Comparator<Node>{
     HashMap<String, Node> nodes;
 
-    public NodeComparator(HashMap<String, Node> nodes){
-        this.nodes = nodes;
-    }
-
-    public int compare(String node1, String node2){
-        double dst1 = nodes.get(node1).getDistance();
-        double dst2 = nodes.get(node2).getDistance();
+    public int compare(Node node1, Node node2){
+        double dst1 = node1.getDistance();
+        double dst2 = node2.getDistance();
         if(dst1 < dst2){
             return -1;
         }

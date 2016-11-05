@@ -10,10 +10,10 @@ public class Node {
     private String id;
     private double latitude;
     private double longitude;
-    private ArrayList<String> edges;
+    private ArrayList<Node> edges;
     private ArrayList<Double> distances;
     private double distance = Double.MAX_VALUE;
-    private String previousNode = null;
+    private Node previousNode = null;
 
     public Node(String id){
         this.id = id;
@@ -46,12 +46,12 @@ public class Node {
         return latitude;
     }
 
-    public void addEdge(String edge, double distance){
+    public void addEdge(Node edge, double distance){
         this.edges.add(edge);
         this.distances.add(distance);
     }
 
-    public ArrayList<String> getEdges(){
+    public ArrayList<Node> getEdges(){
         return edges;
     }
 
@@ -63,7 +63,7 @@ public class Node {
         this.distance = distance;
     }
 
-    public void setPreviousNode(String previousNode){
+    public void setPreviousNode(Node previousNode){
         this.previousNode = previousNode;
     }
 
@@ -71,7 +71,7 @@ public class Node {
         return distance;
     }
 
-    public String getPreviousNode(){
+    public Node getPreviousNode(){
         return previousNode;
     }
 
@@ -98,5 +98,9 @@ public class Node {
         return result;
     }
 
+    @Override
+    public String toString(){
+        return this.id;
+    }
 
 }

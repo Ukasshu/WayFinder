@@ -56,19 +56,30 @@ public class GraphReader {
                 }
                 ListIterator<String> idIterator = ids.listIterator(0);
                 ListIterator<Double> distanceIterator = distances.listIterator(0);
-                String previous = null;
                 String current = idIterator.next();
+                Node previousNode = null;
+                Node currentNode = null;
                 Double dist = null;
                 if(!graph.containsKey(current)){
-                    graph.put(current, new Node(current));
+                    currentNode = new Node(current);
+                    graph.put(current, currentNode);
+                }
+                else{
+                    currentNode = graph.get(current);
                 }
                 while(idIterator.hasNext()){
-                    previous = current;
+                    previousNode = currentNode;
                     current = idIterator.next();
                     dist = distanceIterator.next();
-                    graph.put(current, new Node(current));
-                    graph.get(current).addEdge(previous, dist);
-                    graph.get(previous).addEdge(current, dist);
+                    if(!graph.containsKey(current)) {
+                        currentNode = new Node(current);
+                        graph.put(current, currentNode);
+                    }
+                    else{
+                        currentNode = graph.get(current);
+                    }
+                    currentNode.addEdge(previousNode, dist);
+                    previousNode.addEdge(currentNode, dist);
                 }
             }
             currentLine = input.nextLine();
@@ -107,4 +118,5 @@ public class GraphReader {
         this.readNodes();
         this.graphRead = true;
     }
+
 }
