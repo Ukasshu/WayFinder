@@ -5,30 +5,32 @@ import java.util.HashMap;
 import java.util.ListIterator;
 import java.util.Scanner;
 
+import Exceptions.*;
+
 /**
  * Class which provides reading graph from file
  *
  * @author Łukasz Mielczarek
- * @version 01.11.2016
+ * @version 04.11.2016
  */
 public class GraphReader {
     private File file;
     private Scanner input;
     private HashMap<String, Node> graph;
     private String currentLine;
+    private boolean graphRead;
 
     public GraphReader(){
         this.file = null;
         this.input = null;
-        this.graph =null;
+        this.graph = null;
     }
 
-    private void openFile(String filepath){
+    public void openFile(String filepath) throws FileNotFoundException{
         file = new File(filepath);
-    }
-
-    private void openStream() throws FileNotFoundException{
+        graphRead = false;
         input = new Scanner(file);
+        graph = new HashMap<>();
     }
 
     private void readEdges(){
@@ -57,7 +59,9 @@ public class GraphReader {
                 String previous = null;
                 String current = idIterator.next();
                 Double dist = null;
-                graph.put(current, new Node(current));
+                if(!graph.containsKey(current)){
+                    graph.put(current, new Node(current));
+                }
                 while(idIterator.hasNext()){
                     previous = current;
                     current = idIterator.next();
@@ -67,17 +71,40 @@ public class GraphReader {
                     graph.get(previous).addEdge(current, dist);
                 }
             }
+            currentLine = input.nextLine();
         }
     }
 
     private void readNodes(){
-
+        String id;
+        double longitude;
+        double latitude;
+        while(input.hasNextLine()){
+            if(currentLine.matches("(.*)[{](.*)")){
+                currentLine = input.nextLine();
+                id = currentLine.replaceAll("[^\\d.]","");
+                currentLine = input.nextLine();
+                latitude = Double.parseDouble(currentLine.replaceAll("[^\\d.]",""));
+                currentLine = input.nextLine();
+                longitude = Double.parseDouble(currentLine.replaceAll("[^\\d.]",""));
+                if(graph.containsKey(id)) {
+                    graph.get(id).setCoordinates(latitude, longitude);
+                }
+            }
+            currentLine = input.nextLine();
+        }
     }
 
+    public HashMap<String, Node> returnGraph() throws GraphNotReadYetException {
+        if(!graphRead){
+            throw new GraphNotReadYetException("Graph has not been already read!");
+        }
+        return graph;
+    }
 
-
-    private void readGraph(){
+    public void readGraph(){
         this.readEdges();
         this.readNodes();
+        this.graphRead = true;
     }
 }
