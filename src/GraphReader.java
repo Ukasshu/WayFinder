@@ -14,18 +14,41 @@ import Exceptions.*;
  * @version 04.11.2016
  */
 public class GraphReader {
+    /**
+     * Represents opened file
+     */
     private File file;
+    /**
+     * Stream that reads the file
+     */
     private Scanner input;
+    /**
+     * Holds all read Nodes
+     */
     private HashMap<String, Node> graph;
+    /**
+     * Holds the line of file that is currently analysed
+     */
     private String currentLine;
+    /**
+     * Remembers is the opened file has been already read
+     */
     private boolean graphRead;
 
+    /**
+     * Default constructor
+     */
     public GraphReader(){
         this.file = null;
         this.input = null;
         this.graph = null;
     }
 
+    /**
+     * Opens stream to the file that will be read
+     * @param filepath path to the file that will be read
+     * @throws FileNotFoundException if the file cannot be opened
+     */
     public void openFile(String filepath) throws FileNotFoundException{
         if(input!=null){
             input.close();
@@ -36,6 +59,9 @@ public class GraphReader {
         graph = new HashMap<>();
     }
 
+    /**
+     * Reads the ways from file and converts them into edges
+     */
     private void readEdges(){
         ArrayList<String> ids = null;
         ArrayList<Double> distances = null;
@@ -58,11 +84,11 @@ public class GraphReader {
                     currentLine = input.nextLine();
                 }
                 ListIterator<String> idIterator = ids.listIterator(0);
-                ListIterator<Double> distanceIterator = distances.listIterator(0);
+                //ListIterator<Double> distanceIterator = distances.listIterator(0);
                 String current = idIterator.next();
                 Node previousNode = null;
                 Node currentNode = null;
-                Double dist = null;
+                //Double dist = null;
                 if(!graph.containsKey(current)){
                     currentNode = new Node(current);
                     graph.put(current, currentNode);
@@ -73,7 +99,7 @@ public class GraphReader {
                 while(idIterator.hasNext()){
                     previousNode = currentNode;
                     current = idIterator.next();
-                    dist = distanceIterator.next();
+                    //dist = distanceIterator.next();
                     if(!graph.containsKey(current)) {
                         currentNode = new Node(current);
                         graph.put(current, currentNode);
@@ -81,14 +107,17 @@ public class GraphReader {
                     else{
                         currentNode = graph.get(current);
                     }
-                    currentNode.addEdge(previousNode, dist);
-                    previousNode.addEdge(currentNode, dist);
+                    currentNode.addEdge(previousNode);
+                    previousNode.addEdge(currentNode);
                 }
             }
             currentLine = input.nextLine();
         }
     }
 
+    /**
+     * Reads the coordinates of the Nodes
+     */
     private void readNodes(){
         String id;
         double longitude;
@@ -109,6 +138,11 @@ public class GraphReader {
         }
     }
 
+    /**
+     * Returns HashMap with all Nodes
+     * @return HashMap with all Nodes
+     * @throws GraphNotReadYetException if method is called before reading the whole file
+     */
     public HashMap<String, Node> returnGraph() throws GraphNotReadYetException {
         if(!graphRead){
             throw new GraphNotReadYetException("Graph has not been already read!");
@@ -116,6 +150,9 @@ public class GraphReader {
         return graph;
     }
 
+    /**
+     * Method that calls methods providing reading the file
+     */
     public void readGraph(){
         this.readEdges();
         this.readNodes();

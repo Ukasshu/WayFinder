@@ -246,6 +246,8 @@ public class MainView extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if(shortestWay != null) {
+                    double tst = 0;
+                    Node tmp = null;
                     JFileChooser fc = new JFileChooser();
                     fc.setDialogTitle("Save way as text...");
                     final int returnedValue = fc.showSaveDialog(contentPane);
@@ -255,7 +257,12 @@ public class MainView extends JDialog {
                             PrintWriter output = new PrintWriter(file);
                             for (Node n : shortestWay){
                                 output.println(n);
+                                if(tmp!=null){
+                                    tst += n.distance(tmp);
+                                }
+                                tmp = n;
                             }
+                            output.println(tst);
                             output.close();
                         } catch (Exception exc) {
                             JOptionPane.showMessageDialog(contentPane, "Cannot save file");
