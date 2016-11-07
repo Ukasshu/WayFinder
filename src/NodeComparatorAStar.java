@@ -5,7 +5,7 @@ import java.util.Comparator;
  * @author Łukasz Mielczarek
  * @version 05.11.16
  */
-public class NodeComparator implements Comparator<Node>{
+public class NodeComparatorAStar implements Comparator<Node>{
 
     /**
      * Compares distance from the start Node
@@ -14,8 +14,8 @@ public class NodeComparator implements Comparator<Node>{
      * @return -1 if first Node has lower distance, 1 if second has, 0 if they both have the same one
      */
     public int compare(Node node1, Node node2){
-        double dst1 = node1.getDistance();
-        double dst2 = node2.getDistance();
+        double dst1 = node1.getForecastedDistance();
+        double dst2 = node2.getForecastedDistance();
         if(dst1 < dst2){
             return -1;
         }

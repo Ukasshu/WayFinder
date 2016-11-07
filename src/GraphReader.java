@@ -84,7 +84,6 @@ public class GraphReader {
                     currentLine = input.nextLine();
                 }
                 ListIterator<String> idIterator = ids.listIterator(0);
-                //ListIterator<Double> distanceIterator = distances.listIterator(0);
                 String current = idIterator.next();
                 Node previousNode = null;
                 Node currentNode = null;
@@ -99,7 +98,6 @@ public class GraphReader {
                 while(idIterator.hasNext()){
                     previousNode = currentNode;
                     current = idIterator.next();
-                    //dist = distanceIterator.next();
                     if(!graph.containsKey(current)) {
                         currentNode = new Node(current);
                         graph.put(current, currentNode);
@@ -157,6 +155,9 @@ public class GraphReader {
         this.readEdges();
         this.readNodes();
         this.graphRead = true;
+        for(Node n: graph.values()){
+            n.calculateDistances();
+        }
     }
 
 }

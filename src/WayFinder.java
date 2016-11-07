@@ -22,7 +22,7 @@ public class WayFinder {
     /**
      * Comparator used to determine the Nodes' priority in the PriorityQueue
      */
-    private NodeComparator comparator;
+    private Comparator comparator;
 
     /**
      * WayFinder's construcyor
@@ -30,19 +30,20 @@ public class WayFinder {
      */
     public WayFinder(HashMap<String, Node> graph){
         this.graph = graph;
-        this.comparator = new NodeComparator();
         this.foundWay = new ArrayList<>();
     }
 
     /**
-     * Starts the work of the WayFinder
+     * Starts the work of the WayFinder with Dijkstra's algorithm
      * @param start ID of the start Node
      * @param goal ID of the goal Node
      */
-    public void runFinder(String start, String goal){
+    public void runFinderDijkstra(String start, String goal){
+        this.comparator = new NodeComparator();
         this.queue = new PriorityQueue<>(comparator);
         for(Node n: graph.values()){
             n.setDistance(Double.MAX_VALUE);
+            n.setPreviousNode(null);
         }
         graph.get(start).setDistance((double) 0);
         this.queue.add(graph.get(start));
@@ -55,13 +56,11 @@ public class WayFinder {
      */
     private void dijkstra(){
         Node node, tmp;
-        Double dst;
         while(!queue.isEmpty()){
             node = queue.poll();
             for(int i = 0; i< node.getEdges().size(); i++){
                 tmp = node.getEdges().get(i);
-                dst = tmp.getDistance();
-                if(dst > node.getDistance() + node.getDistances().get(i)){
+                if(tmp.getDistance() > node.getDistance() + node.getDistances().get(i)){
                     tmp.setDistance(node.getDistance() + node.getDistances().get(i));
                     tmp.setPreviousNode(node);
                     queue.add(tmp);
@@ -86,6 +85,67 @@ public class WayFinder {
         if(!foundWay.get(0).equals(graph.get(start))){
             foundWay = null;
         }
+    }
+
+    /**
+     * Implements working of A* algorithm
+     * @param start ID of the start Node
+     * @param goal ID of the goal Node
+     */
+    private void aStar(String start, String goal){
+        Node tmp, node;
+        double dst, tmpDst;
+        boolean isBetter;
+        ArrayList<Node> visitedNodes = new ArrayList<>();
+        this.queue.add(graph.get(start));
+        while(!this.queue.isEmpty()){
+            node = queue.poll();
+            if(node.getId() == goal) {
+                return;
+            }
+            visitedNodes.add(node);
+            for(int i =0; i<node.getEdges().size(); i++){
+                tmp = node.getEdges().get(i);
+                dst = node.getDistances().get(i);
+                if(visitedNodes.contains(tmp)){
+                    continue;
+                }
+                tmpDst = node.getDistance() + dst;
+                if(!queue.contains(tmp)){
+                    tmp.setHeuristic(tmp.distance(graph.get(goal)));
+                    tmp.setPreviousNode(node);
+                    tmp.setDistance(tmpDst);
+                    tmp.setForecastedDistance(tmp.getDistance()+tmp.getHeuristic());
+                    queue.add(tmp);
+                }
+                else if(tmpDst < tmp.getDistance()){
+                    tmp.setPreviousNode(node);
+                    tmp.setDistance(tmpDst);
+                    tmp.setForecastedDistance(tmp.getDistance()+tmp.getHeuristic());
+                }
+
+            }
+
+        }
+    }
+
+    /**
+     * Starts the work of the WayFinder with Dijkstra's algorithm
+     * @param start ID of the start Node
+     * @param goal ID of the goal Node
+     */
+    public void runFinderAStar(String start, String goal){
+        for(Node n: graph.values()){
+            n.setDistance(Double.MAX_VALUE);
+            n.setPreviousNode(null);
+            n.setDistance(Double.MAX_VALUE);
+        }
+        this.comparator = new NodeComparatorAStar();
+        this.queue = new PriorityQueue<>(comparator);
+        this.graph.get(start).setDistance(0.0);
+        this.queue.add(this.graph.get(start));
+        aStar(start, goal);
+        extractShortestWay(start, goal);
     }
 
     /**

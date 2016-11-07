@@ -6,6 +6,7 @@ package Exceptions;
  * @author Łukasz Mielczarek
  * @version 03.11.2016
  */
+
 public class GraphNotReadYetException extends Exception {
     public GraphNotReadYetException(String s){
         super(s);

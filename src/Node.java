@@ -32,6 +32,14 @@ public class Node {
      */
     private double distance = Double.MAX_VALUE;
     /**
+     * Used in A* algorithm
+     */
+    private double heuristic;
+    /**
+     * Used in A* algorithm
+     */
+    private double forecastedDistance;
+    /**
      * Holds the reference to the previous Node on the shortestWay
      */
     private Node previousNode = null;
@@ -99,7 +107,6 @@ public class Node {
      */
     public void addEdge(Node edge){
         this.edges.add(edge);
-        this.distances.add(distance(edge));
     }
 
     /**
@@ -207,4 +214,26 @@ public class Node {
         return R*c;
     }
 
+    public void calculateDistances(){
+        for(int i=0; i<edges.size(); i++){
+            distances.add(distance(edges.get(i)));
+        }
+    }
+
+    public double getForecastedDistance() {
+        return forecastedDistance;
+    }
+
+    public void setForecastedDistance(double forecastedDistance) {
+        this.forecastedDistance = forecastedDistance;
+    }
+
+    public double getHeuristic() {
+        return heuristic;
+
+    }
+
+    public void setHeuristic(double heuristic) {
+        this.heuristic = heuristic;
+    }
 }

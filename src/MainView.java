@@ -11,10 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.concurrent.Exchanger;
-import java.util.stream.IntStream;
 
 public class MainView extends JDialog {
     private JPanel contentPane;
@@ -36,6 +33,13 @@ public class MainView extends JDialog {
     private JButton checkGoalCoordinates;
     private JButton checkStartId;
     private JButton checkGoalId;
+    private JRadioButton dijkstraButton;
+    private JRadioButton aStarButton;
+    private JFormattedTextField latitudeClosestNodeTextField;
+    private JFormattedTextField longitudeClosestNodeTextFiel;
+    private JButton findTheClosestNodeButton;
+    private boolean dijkstraAlg = true;
+    private boolean isFileOpen = false;
 
     private GraphReader graphReader = new GraphReader();
     private WayFinder wayFinder = null;
@@ -47,6 +51,12 @@ public class MainView extends JDialog {
         setContentPane(contentPane);
         setModal(true);
         setResizable(false);
+        setTitle("WayFinder");
+        try {
+            UIManager.setLookAndFeel("gtk");
+        }catch (Exception e){
+
+        }
         startCoordinates.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -56,6 +66,7 @@ public class MainView extends JDialog {
                 startId.setSelected(false);
                 startIdField.setEditable(false);
                 checkStartId.setEnabled(false);
+                startCoordinates.setSelected(true);
             }
         });
         startId.addActionListener(new ActionListener() {
@@ -67,6 +78,7 @@ public class MainView extends JDialog {
                 startCoordinates.setSelected(false);
                 startIdField.setEditable(true);
                 checkStartId.setEnabled(true);
+                startId.setSelected(true);
             }
         });
         goalCoordinates.addActionListener(new ActionListener() {
@@ -78,6 +90,7 @@ public class MainView extends JDialog {
                 goalId.setSelected(false);
                 goalIdField.setEditable(false);
                 checkGoalId.setEnabled(false);
+                goalCoordinates.setSelected(true);
             }
         });
         goalId.addActionListener(new ActionListener() {
@@ -89,6 +102,7 @@ public class MainView extends JDialog {
                 goalCoordinates.setSelected(false);
                 goalIdField.setEditable(true);
                 checkGoalId.setEnabled(true);
+                goalId.setSelected(true);
             }
         });
         openFileButton.addActionListener(new ActionListener() {
@@ -102,12 +116,15 @@ public class MainView extends JDialog {
                     try {
                         graphReader.openFile(file.getPath());
                         graphReader.readGraph();
+                        isFileOpen = true;
                         graph = graphReader.returnGraph();
                         wayFinder  = new WayFinder(graph);
                     }catch(FileNotFoundException exc){
                         JOptionPane.showMessageDialog(contentPane, "Error: cannot open the file!");
+                        isFileOpen = false;
                     }catch(GraphNotReadYetException exc){
                         JOptionPane.showMessageDialog(contentPane, "Error: something is \"no yes\" with graph reading");
+                        isFileOpen = false;
                     }
                 }
             }
@@ -233,7 +250,12 @@ public class MainView extends JDialog {
                         }
                     }
                     else{
-                        wayFinder.runFinder(idStart, idGoal);
+                        if(dijkstraAlg) {
+                            wayFinder.runFinderDijkstra(idStart, idGoal);
+                        }
+                        else{
+                            wayFinder.runFinderAStar(idStart, idGoal);
+                        }
                         shortestWay = wayFinder.getFoundWay();
                         if(shortestWay == null){
                             JOptionPane.showMessageDialog(contentPane, "This way does not exist!");
@@ -402,6 +424,48 @@ public class MainView extends JDialog {
                 }
                 else{
                     JOptionPane.showMessageDialog(contentPane, "Such a Node does not exist");
+                }
+            }
+        });
+        dijkstraButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                aStarButton.setSelected(false);
+                dijkstraAlg = true;
+                dijkstraButton.setSelected(true);
+            }
+        });
+        aStarButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dijkstraButton.setSelected(false);
+                dijkstraAlg = false;
+                aStarButton.setSelected(true);
+            }
+        });
+        findTheClosestNodeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(isFileOpen) {
+                    String lat = latitudeClosestNodeTextField.getText();
+                    String lon = longitudeClosestNodeTextFiel.getText();
+                    double dst = Double.MAX_VALUE;
+                    Node theClosest = null;
+                    if (lat.matches("-?[0-9]+[.]?[0-9]*") && lon.matches("-?[0-9]+[.]?[0-9]*")) {
+                        Node tmp = new Node(Double.parseDouble(lat), Double.parseDouble(lon));
+                        for (Node n :graph.values()){
+                            if(n.distance(tmp) < dst){
+                                dst = n.distance(tmp);
+                                theClosest = n;
+                            }
+                        }
+                    }
+                    if(theClosest!=null) {
+                        JOptionPane.showMessageDialog(contentPane, "The closest Node is " + theClosest.getId());
+                    }
+                }
+                else{
+                    JOptionPane.showMessageDialog(contentPane, "The file have not been read yet");
                 }
             }
         });
