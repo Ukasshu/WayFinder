@@ -138,7 +138,7 @@ public class WayFinder {
         for(Node n: graph.values()){
             n.setDistance(Double.MAX_VALUE);
             n.setPreviousNode(null);
-            n.setDistance(Double.MAX_VALUE);
+            n.setForecastedDistance(Double.MAX_VALUE);
         }
         this.comparator = new NodeComparatorAStar();
         this.queue = new PriorityQueue<>(comparator);

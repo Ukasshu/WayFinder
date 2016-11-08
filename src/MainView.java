@@ -52,11 +52,6 @@ public class MainView extends JDialog {
         setModal(true);
         setResizable(false);
         setTitle("WayFinder");
-        try {
-            UIManager.setLookAndFeel("gtk");
-        }catch (Exception e){
-
-        }
         startCoordinates.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -108,6 +103,7 @@ public class MainView extends JDialog {
         openFileButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                shortestWay = null;
                 final JFileChooser fc = new JFileChooser();
                 fc.setDialogTitle("Open file...");
                 final int returnedValue = fc.showOpenDialog(contentPane);
