@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.ListIterator;
@@ -13,7 +14,7 @@ import Exceptions.*;
  * @author Łukasz Mielczarek
  * @version 04.11.2016
  */
-public class GraphReader {
+public class GraphReader implements Serializable{
     /**
      * Represents opened file
      */
@@ -21,7 +22,7 @@ public class GraphReader {
     /**
      * Stream that reads the file
      */
-    private Scanner input;
+    private transient Scanner input;
     /**
      * Holds all read Nodes
      */

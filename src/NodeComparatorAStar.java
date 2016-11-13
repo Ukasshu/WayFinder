@@ -1,3 +1,4 @@
+import java.io.Serializable;
 import java.util.Comparator;
 
 /**
@@ -5,7 +6,7 @@ import java.util.Comparator;
  * @author Łukasz Mielczarek
  * @version 05.11.16
  */
-public class NodeComparatorAStar implements Comparator<Node>{
+public class NodeComparatorAStar implements Comparator<Node>, Serializable{
 
     /**
      * Compares distance from the start Node

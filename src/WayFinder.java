@@ -1,3 +1,4 @@
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -6,7 +7,7 @@ import java.util.*;
  * @author Łukasz Mielczarek
  * @version 04.11.2016
  */
-public class WayFinder {
+public class WayFinder implements Serializable{
     /**
      * HashMap holding all Nodes
      */

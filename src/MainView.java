@@ -6,10 +6,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -38,14 +35,14 @@ public class MainView extends JDialog {
     private JFormattedTextField latitudeClosestNodeTextField;
     private JFormattedTextField longitudeClosestNodeTextFiel;
     private JButton findTheClosestNodeButton;
-    private boolean dijkstraAlg = true;
-    private boolean isFileOpen = false;
+    private Boolean dijkstraAlg = true;
+    private Boolean isFileOpen = false;
 
     private GraphReader graphReader = new GraphReader();
     private WayFinder wayFinder = null;
     private HashMap<String, Node> graph = null;
     private ArrayList<Node> shortestWay = null;
-    private double[] bounds = {Double.MAX_VALUE, Double.MAX_VALUE, Double.MIN_VALUE, Double.MIN_VALUE};
+    private Double[] bounds = {Double.MAX_VALUE, Double.MAX_VALUE, Double.MIN_VALUE, Double.MIN_VALUE};
 
     public MainView() {
         setContentPane(contentPane);
@@ -294,69 +291,76 @@ public class MainView extends JDialog {
         saveImageButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                double lat, lon;
-                for(Node n: graph.values()){
-                    lat = n.getLatitude();
-                    lon = n.getLongitude();
-                    if(lat < bounds[0])
-                        bounds[0] = lat;
-                    if(lat > bounds[2])
-                        bounds[2] = lat;
-                    if(lon < bounds[1])
-                        bounds[1] = lon;
-                    if(lon > bounds[3])
-                        bounds[3] = lon;
-                }
-                int width = (int)Math.round(800 * (bounds[3]-bounds[1])/(bounds[2]-bounds[0]));;
-                int height =800;
-                BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-                Graphics2D grph = image.createGraphics();
-                grph.setColor(Color.WHITE);
-                grph.fillRect(0,0,width, height);
-                grph.setColor(Color.BLACK);
-                int x1=0, x2=0, y1=0, y2=0;
-                for(Node n: graph.values()){
-                    x1 = (int)Math.round(width * (n.getLongitude()-bounds[1])/(bounds[3]-bounds[1]));
-                    y1 = (int)Math.round(height -height * (n.getLatitude()-bounds[0])/(bounds[2]-bounds[0]));
-                    for(Node n2: n.getEdges()){
-                        x2 = (int) Math.round(width * (n2.getLongitude() - bounds[1]) / (bounds[3] - bounds[1]));
-                        y2 = (int) Math.round(height - height * (n2.getLatitude() - bounds[0]) / (bounds[2] - bounds[0]));
-                        //if(!shortestWay.contains(n) && !shortestWay.contains(n2))
-                            grph.drawLine(x1, y1, x2, y2);
+                if (shortestWay != null && graph != null) {
+                    double lat, lon;
+                    for (Node n : graph.values()) {
+                        lat = n.getLatitude();
+                        lon = n.getLongitude();
+                        if (lat < bounds[0])
+                            bounds[0] = lat;
+                        if (lat > bounds[2])
+                            bounds[2] = lat;
+                        if (lon < bounds[1])
+                            bounds[1] = lon;
+                        if (lon > bounds[3])
+                            bounds[3] = lon;
                     }
-                    grph.setColor(Color.RED);
-                    grph.fillRect(x1-1,y1-1,2,2);
+                    int width = (int) Math.round(800 * (bounds[3] - bounds[1]) / (bounds[2] - bounds[0]));
+                    ;
+                    int height = 800;
+                    BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+                    Graphics2D grph = image.createGraphics();
+                    grph.setColor(Color.WHITE);
+                    grph.fillRect(0, 0, width, height);
                     grph.setColor(Color.BLACK);
-                }
-                grph.setColor(Color.GREEN);
-                grph.setStroke(new BasicStroke(10));
-                Node n2 = null;
-                for(Node n: shortestWay){
-                    if(n2 != null){
-                        x1 = (int)Math.round(width * (n.getLongitude()-bounds[1])/(bounds[3]-bounds[1]));
-                        y1 = (int)Math.round(height -height * (n.getLatitude()-bounds[0])/(bounds[2]-bounds[0]));
-                        x2 = (int) Math.round(width * (n2.getLongitude() - bounds[1]) / (bounds[3] - bounds[1]));
-                        y2 = (int) Math.round(height - height * (n2.getLatitude() - bounds[0]) / (bounds[2] - bounds[0]));
-                        grph.drawLine(x1,y1,x2,y2);
-                        grph.setColor(Color.BLUE);
-                        grph.fillRect(x1-2,y1-2,4,4);
-                        grph.fillRect(x2-2,y2-2,4,4);
-                        grph.setColor(Color.GREEN);
+                    int x1 = 0, x2 = 0, y1 = 0, y2 = 0;
+                    for (Node n : graph.values()) {
+                        x1 = (int) Math.round(width * (n.getLongitude() - bounds[1]) / (bounds[3] - bounds[1]));
+                        y1 = (int) Math.round(height - height * (n.getLatitude() - bounds[0]) / (bounds[2] - bounds[0]));
+                        for (Node n2 : n.getEdges()) {
+                            x2 = (int) Math.round(width * (n2.getLongitude() - bounds[1]) / (bounds[3] - bounds[1]));
+                            y2 = (int) Math.round(height - height * (n2.getLatitude() - bounds[0]) / (bounds[2] - bounds[0]));
+                            //if(!shortestWay.contains(n) && !shortestWay.contains(n2))
+                            grph.drawLine(x1, y1, x2, y2);
+                        }
+                        grph.setColor(Color.RED);
+                        grph.fillRect(x1 - 1, y1 - 1, 2, 2);
+                        grph.setColor(Color.BLACK);
                     }
-                    n2 = n;
-                }
-                JFileChooser fc = new JFileChooser();
-                fc.setDialogTitle("Saving image...");
-                final int returnedValue = fc.showSaveDialog(contentPane);
-                if(returnedValue == JFileChooser.APPROVE_OPTION){
-                    try {
-                        File file = fc.getSelectedFile();
-                        ImageIO.write(image, "png", file);
-                    }catch (IOException exc){
-                        JOptionPane.showMessageDialog(contentPane, "Cannot save file");
+                    grph.setColor(Color.GREEN);
+                    grph.setStroke(new BasicStroke(10));
+                    Node n2 = null;
+                    for (Node n : shortestWay) {
+                        if (n2 != null) {
+                            x1 = (int) Math.round(width * (n.getLongitude() - bounds[1]) / (bounds[3] - bounds[1]));
+                            y1 = (int) Math.round(height - height * (n.getLatitude() - bounds[0]) / (bounds[2] - bounds[0]));
+                            x2 = (int) Math.round(width * (n2.getLongitude() - bounds[1]) / (bounds[3] - bounds[1]));
+                            y2 = (int) Math.round(height - height * (n2.getLatitude() - bounds[0]) / (bounds[2] - bounds[0]));
+                            grph.drawLine(x1, y1, x2, y2);
+                            grph.setColor(Color.BLUE);
+                            grph.fillRect(x1 - 2, y1 - 2, 4, 4);
+                            grph.fillRect(x2 - 2, y2 - 2, 4, 4);
+                            grph.setColor(Color.GREEN);
+                        }
+                        n2 = n;
                     }
+                    JFileChooser fc = new JFileChooser();
+                    fc.setDialogTitle("Saving image...");
+                    final int returnedValue = fc.showSaveDialog(contentPane);
+                    if (returnedValue == JFileChooser.APPROVE_OPTION) {
+                        try {
+                            File file = fc.getSelectedFile();
+                            ImageIO.write(image, "png", file);
+                        } catch (IOException exc) {
+                            JOptionPane.showMessageDialog(contentPane, "Cannot save file");
+                        }
+                    }
+                }
+                else{
+                    JOptionPane.showMessageDialog(contentPane, "There is nothing to save");
                 }
             }
+
         });
         checkStartCoordinates.addActionListener(new ActionListener() {
             @Override
@@ -442,7 +446,7 @@ public class MainView extends JDialog {
         findTheClosestNodeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(isFileOpen) {
+                if(graph!= null) {
                     String lat = latitudeClosestNodeTextField.getText();
                     String lon = longitudeClosestNodeTextFiel.getText();
                     double dst = Double.MAX_VALUE;
@@ -469,8 +473,79 @@ public class MainView extends JDialog {
 
     public static void main(String[] args) {
         MainView dialog = new MainView();
+        try{
+            dialog.deserialize();
+        }catch (Exception e){
+            System.out.println("STH IS NO YES");
+        }
         dialog.pack();
         dialog.setVisible(true);
+        try {
+            dialog.serialize();
+        }catch (Exception e){
+            System.out.println("STH IS NO YES");
+            e.printStackTrace();
+        }
         System.exit(0);
     }
+
+    public void serialize() throws IOException{
+        FileOutputStream fos = new FileOutputStream("./data");
+        ObjectOutputStream oos = new ObjectOutputStream(fos);
+        ArrayList<Object> objects = new ArrayList<>();
+        objects.add(this.graphReader);
+        objects.add(this.wayFinder);
+        objects.add(this.graph);
+        objects.add(this.shortestWay);
+        objects.add(bounds);
+        oos.writeObject(objects);
+        oos.close();
+        fos.close();
+    }
+
+    public void deserialize() throws IOException, ClassNotFoundException{
+        FileInputStream fis = new FileInputStream("./data");
+        ObjectInputStream ois = new ObjectInputStream(fis);
+        ArrayList<Object> objects = (ArrayList<Object>) ois.readObject();
+        this.graphReader = (GraphReader) objects.remove(0);
+        this.wayFinder = (WayFinder) objects.remove(0);
+        this.graph = (HashMap<String, Node>) objects.remove(0);
+        this.shortestWay = (ArrayList<Node>) objects.remove(0);
+        this.bounds = (Double[]) objects.remove(0);
+        ois.close();
+        fis.close();
+    }
+
+    /* public void deserialize() throws IOException, ClassNotFoundException{
+ +        FileInputStream fis = new FileInputStream("./data");
+ +        ObjectInputStream ois = new ObjectInputStream(fis);
+ +        ArrayList<Object> objects = (ArrayList<Object>)ois.readObject();
+ +        this.nodes = (HashMap<String, Node>) objects.remove(0);
+ +        this.mapReader = (MapReader) objects.remove(0);
+ +        this.dataConverter = (DataConverter) objects.remove(0);
+ +        this.bounds = (Double[]) objects.remove(0);
+ +        this.width = (Integer) objects.remove(0);
+ +        this.height = (Integer) objects.remove(0);
+ +        ois.close();
+ +        fis.close();
+ +        File file = new File("./image");
+ +        this.graph = ImageIO.read(file);
+ +    }
+ +
+ +    public void serialize() throws IOException{
+ +        FileOutputStream fos = new FileOutputStream("./data");
+ +        ObjectOutputStream oos = new ObjectOutputStream(fos);
+ +        ArrayList<Object> objects = new ArrayList<>();
+ +        objects.add(this.nodes);
+ +        objects.add(this.mapReader);
+ +        objects.add(this.dataConverter);
+ +        objects.add(this.bounds);
+ +        objects.add(this.width);
+ +        objects.add(this.height);
+ +        oos.writeObject(objects);
+ +        oos.close();
+ +        fos.close();
+ +        File file = new File("./image");
+ +        ImageIO.write(graph, "png", file);
+ +    }*/
 }

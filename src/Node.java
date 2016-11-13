@@ -1,3 +1,4 @@
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -6,7 +7,7 @@ import java.util.ArrayList;
  * @author Łukasz Mielczarek
  * @version 04.11.2016
  */
-public class Node {
+public class Node implements Serializable{
     /**
      * Holds the id of the Node
      */
