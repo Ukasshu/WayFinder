@@ -515,37 +515,4 @@ public class MainView extends JDialog {
         ois.close();
         fis.close();
     }
-
-    /* public void deserialize() throws IOException, ClassNotFoundException{
- +        FileInputStream fis = new FileInputStream("./data");
- +        ObjectInputStream ois = new ObjectInputStream(fis);
- +        ArrayList<Object> objects = (ArrayList<Object>)ois.readObject();
- +        this.nodes = (HashMap<String, Node>) objects.remove(0);
- +        this.mapReader = (MapReader) objects.remove(0);
- +        this.dataConverter = (DataConverter) objects.remove(0);
- +        this.bounds = (Double[]) objects.remove(0);
- +        this.width = (Integer) objects.remove(0);
- +        this.height = (Integer) objects.remove(0);
- +        ois.close();
- +        fis.close();
- +        File file = new File("./image");
- +        this.graph = ImageIO.read(file);
- +    }
- +
- +    public void serialize() throws IOException{
- +        FileOutputStream fos = new FileOutputStream("./data");
- +        ObjectOutputStream oos = new ObjectOutputStream(fos);
- +        ArrayList<Object> objects = new ArrayList<>();
- +        objects.add(this.nodes);
- +        objects.add(this.mapReader);
- +        objects.add(this.dataConverter);
- +        objects.add(this.bounds);
- +        objects.add(this.width);
- +        objects.add(this.height);
- +        oos.writeObject(objects);
- +        oos.close();
- +        fos.close();
- +        File file = new File("./image");
- +        ImageIO.write(graph, "png", file);
- +    }*/
 }
